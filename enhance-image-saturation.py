@@ -3,36 +3,46 @@ import sys
 from PIL import Image, ImageEnhance
 
 def enhance_image(file_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension):
-    img = Image.open(file_path)
+    try:
+        img = Image.open(file_path)
 
-    # Enhance color/saturation
-    color_converter = ImageEnhance.Color(img)
-    img = color_converter.enhance(enhancement_factor)
+        # Enhance color/saturation
+        color_converter = ImageEnhance.Color(img)
+        img = color_converter.enhance(enhancement_factor)
 
-    # Enhance brightness
-    brightness_converter = ImageEnhance.Brightness(img)
-    img = brightness_converter.enhance(brightness_factor)
+        # Enhance brightness
+        brightness_converter = ImageEnhance.Brightness(img)
+        img = brightness_converter.enhance(brightness_factor)
 
-    # Enhance contrast
-    contrast_converter = ImageEnhance.Contrast(img)
-    img = contrast_converter.enhance(contrast_factor)
+        # Enhance contrast
+        contrast_converter = ImageEnhance.Contrast(img)
+        img = contrast_converter.enhance(contrast_factor)
 
-    # Resize image proportionally
-    width, height = img.size
-    if width > height:
-        new_width = max_dimension
-        new_height = int((max_dimension / width) * height)
-    else:
-        new_height = max_dimension
-        new_width = int((max_dimension / height) * width)
-    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        # Resize image proportionally
+        width, height = img.size
+        if width > height:
+            new_width = max_dimension
+            new_height = int((max_dimension / width) * height)
+        else:
+            new_height = max_dimension
+            new_width = int((max_dimension / height) * width)
+        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
-    # Append "_enhanced" before the file extension
-    base, ext = os.path.splitext(file_path)
-    new_file_path = f"{base}_enhanced{ext}"
+        # Append "_enhanced" before the file extension
+        base, ext = os.path.splitext(file_path)
+        new_file_path = f"{base}_enhanced{ext}"
 
-    img.save(new_file_path)
-    print(f"Enhanced image saved as: {new_file_path}")
+        img.save(new_file_path)
+        print(f"Enhanced image saved as: {new_file_path}")
+    except Exception as e:
+        print(f"")
+        print(f"************************************************")
+        print(f"********* {file_path}: {e}")
+        print(f"Error processing file {file_path}: {e}")
+        print(f"*************************************************")
+        print(f"")
+
+
 
 def process_directory(directory_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension):
     for filename in os.listdir(directory_path):
