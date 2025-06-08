@@ -2,7 +2,7 @@ import os
 import sys
 from PIL import Image, ImageEnhance
 
-def enhance_image(file_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension):
+def enhance_image(file_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension=None):
     try:
         img = Image.open(file_path)
 
@@ -18,15 +18,16 @@ def enhance_image(file_path, enhancement_factor, brightness_factor, contrast_fac
         contrast_converter = ImageEnhance.Contrast(img)
         img = contrast_converter.enhance(contrast_factor)
 
-        # Resize image proportionally
-        width, height = img.size
-        if width > height:
-            new_width = max_dimension
-            new_height = int((max_dimension / width) * height)
-        else:
-            new_height = max_dimension
-            new_width = int((max_dimension / height) * width)
-        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        # Resize image proportionally if max_dimension is specified
+        if max_dimension is not None:
+            width, height = img.size
+            if width > height:
+                new_width = max_dimension
+                new_height = int((max_dimension / width) * height)
+            else:
+                new_height = max_dimension
+                new_width = int((max_dimension / height) * width)
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
         # Append "_enhanced" before the file extension
         base, ext = os.path.splitext(file_path)
@@ -42,17 +43,15 @@ def enhance_image(file_path, enhancement_factor, brightness_factor, contrast_fac
         print(f"*************************************************")
         print(f"")
 
-
-
-def process_directory(directory_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension):
+def process_directory(directory_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension=None):
     for filename in os.listdir(directory_path):
         if filename.lower().endswith(('png', 'jpg', 'jpeg', 'bmp', 'gif', 'tiff')):
             file_path = os.path.join(directory_path, filename)
             enhance_image(file_path, enhancement_factor, brightness_factor, contrast_factor, max_dimension)
 
 def main():
-    if len(sys.argv) < 6:
-        print("Usage: python enhance_image.py <file_or_directory_path> <enhancement_factor> <brightness_factor> <contrast_factor> <max_dimension>")
+    if len(sys.argv) < 5:
+        print("Usage: python enhance_image.py <file_or_directory_path> <enhancement_factor> <brightness_factor> <contrast_factor> [max_dimension]")
         sys.exit(1)
 
     path = sys.argv[1]
@@ -60,8 +59,8 @@ def main():
         enhancement_factor = float(sys.argv[2])
         brightness_factor = float(sys.argv[3])
         contrast_factor = float(sys.argv[4])
-        max_dimension = int(sys.argv[5])
-        print(f"Enhancement factor: {enhancement_factor}, Brightness factor: {brightness_factor}, Contrast factor: {contrast_factor}, Max dimension: {max_dimension}px")
+        max_dimension = int(sys.argv[5]) if len(sys.argv) > 5 else None
+        print(f"Enhancement factor: {enhancement_factor}, Brightness factor: {brightness_factor}, Contrast factor: {contrast_factor}, Max dimension: {max_dimension if max_dimension else 'No resizing'}")
     except ValueError:
         print("The enhancement, brightness, contrast factors must be numbers, and max dimension must be an integer.")
         sys.exit(1)
